@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Response Test (Participant)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .stroop-word {
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            transition: opacity 0.15s ease-in-out;
+        }
+        #progressBar {
+            transition: width 1.5s linear;
+        }
+        .screen { transition: opacity 0.5s ease-in-out; }
+        .hidden { display: none; }
+        .response-button {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 2.25rem;
+            border: 2px solid black;
+            color: black;
+            background-color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .response-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1);
+        }
+        .response-button:active {
+            transform: scale(0.95);
+            background-color: #e0e0f0;
+        }
+        .wait-message {
+            font-weight: 600;
+            color: #4f46e5; /* indigo-600 */
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            background-color: #eef2ff; /* indigo-50 */
+            border-radius: 0.5rem;
+            display: inline-block;
+        }
+        .stress-option.selected {
+            background-color: #e0e7ff; /* indigo-200 */
+            border-color: #6366f1; /* indigo-500 */
+            font-weight: 600;
+            box-shadow: 0 0 0 2px #818cf8; /* indigo-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div id="main-content" class="w-full">
+        <div id="app-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto">
+            <div id="sessionIdContainer" class="absolute bottom-4 left-4 bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md">
+                Session ID: <span id="sessionIdDisplay" class="font-bold"></span>
+            </div>
+            <!-- All Screens -->
+            <div id="welcome" class="screen"><div class="max-w-4xl mx-auto"><h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">Color Response Test</h1><p class="text-gray-600 mb-8 text-lg">This test will take approximately 22 minutes.</p><p class="wait-message">Please wait for the researcher to begin.</p></div></div>
+            
+            <div id="preBaselineSurvey" class="screen hidden">
+                <div class="max-w-4xl mx-auto text-left space-y-4">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Log Your Stress Level (Before Task)</h2>
+                    <p>Please select your current stress level from the options below. Your selection will be shared with the researcher.</p>
+                    <div class="my-4 p-4 border rounded-lg bg-gray-50">
+                        <p class="font-bold">What is your current stress level?</p>
+                        <div class="stress-option-group mt-2 space-y-2" data-survey-type="pre">
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Very stressed">😰 Very stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Stressed">😨 Stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Somewhat stressed">😥 Somewhat stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Neutral">😶 Neutral</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Not stressed at all">😌 Not stressed at all</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="No answer">⚪️ No answer</div>
+                        </div>
+                    </div>
+                    <p class="text-center wait-message">Waiting for the researcher to continue...</p>
+                </div>
+            </div>
+
+            <div id="baseline" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-4">Resting Baseline</h2><p class="text-gray-600 mb-6">Please relax, clear your mind, and remain still and quiet for three minutes.</p><div class="text-6xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00</div><p class="wait-message">The researcher will start the timer.</p></div></div>
+            <div id="instructions" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-6">Color Response Instructions</h2><div class="text-left mx-auto text-gray-700 space-y-4"><p class="font-bold">Important: Respond to the <em>color</em> of the text, not the actual word.</p><p>You have two ways to respond:</p><ul class="list-disc list-inside ml-4 space-y-2"><li><strong>Use your keyboard:</strong><ul class="list-none list-inside ml-6 font-semibold"><li>Press <strong class="text-red-600">R</strong> for Red</li><li>Press <strong class="text-green-600">G</strong> for Green</li><li>Press <strong class="text-blue-600">B</strong> for Blue</li><li>Press <strong class="text-yellow-500">Y</strong> for Yellow</li></ul></li><li><strong>Click the on-screen buttons:</strong> Use your mouse to click the buttons below the word.</li></ul><p><strong>Examples:</strong></p><div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-1"><div>If you see <span style="color:red; font-weight: bold;">GREEN</span> → Press “R” for Red.</div><div>If you see <span style="color:blue; font-weight: bold;">RED</span> → Press “B” for Blue.</div></div><p>Focus on the color of the text, not what the word says.</p></div><div class="text-center mt-8"><button class="button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="startPractice()">Start Practice</button></div></div></div>
+            <div id="practice" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-2">Practice Session</h2><div class="instructions text-gray-600 mb-4 mx-auto min-h-[10rem] flex items-center justify-center p-4"><div id="practiceInstruction">Let's practice responding to colors.</div></div><div id="practiceElements" class="hidden"><div class="stroop-word text-6xl my-4" id="practiceWord"></div><div class="flex justify-center space-x-4 my-6" id="practiceButtons"><button class="response-button" onclick="checkPracticeResponse('red')">R</button><button class="response-button" onclick="checkPracticeResponse('green')">G</button><button class="response-button" onclick="checkPracticeResponse('blue')">B</button><button class="response-button" onclick="checkPracticeResponse('yellow')">Y</button></div><div class="text-2xl font-bold h-10 my-4" id="practiceFeedback"></div></div><button id="practiceNextBtn" class="button hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg mt-4" onclick="handlePracticeNext()">Next</button><button class="button hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg" id="startTestBtn" onclick="startColorTest()">Begin Color Response Test</button></div></div>
+            <div id="challengeInstructions" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-6">Competition Instructions</h2><div class="text-left mx-auto text-gray-700 space-y-4 bg-indigo-50 p-6 rounded-lg"><p>You'll now compete against a simulated opponent.</p><p>Your goal is to finish each trial as <strong>fast and as accurately as possible</strong>.</p><p>There are three rounds. After each round you'll see a performance summary; review it briefly, then the next round will begin.</p></div><p class="wait-message">Waiting for the researcher to begin Round 1.</p></div></div>
+            <div id="colorTest" class="screen hidden relative"><div class="max-w-4xl mx-auto"><h2 id="blockTitle" class="text-3xl font-bold text-gray-800">Color Response - Block 1</h2><div class="text-5xl font-mono font-bold my-2 text-gray-700" id="colorTimer">3:00</div><div class="stroop-word text-7xl my-8" id="colorWord">READY</div><div class="w-full max-w-md mx-auto bg-gray-200 rounded-full h-4 mt-2 mb-6"><div id="progressBar" class="bg-indigo-600 h-4 rounded-full"></div></div><div class="flex justify-center space-x-2 sm:space-x-4 my-6"><button class="response-button" onclick="checkResponse('red')">R</button><button class="response-button" onclick="checkResponse('green')">G</button><button class="response-button" onclick="checkResponse('blue')">B</button><button class="response-button" onclick="checkResponse('yellow')">Y</button></div><div class="text-4xl font-bold h-12" id="feedback"></div></div><div class="absolute bottom-0 right-0 text-red-500 text-xl font-bold">Wrong: <span id="wrong">0</span></div></div>
+            <div id="blockComplete" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 id="blockCompleteTitle" class="text-4xl font-extrabold text-gray-800 mb-6">Block Complete</h2><div class="flex flex-col sm:flex-row justify-around items-center gap-6"><div class="border-4 border-red-400 bg-red-50 p-6 rounded-2xl w-full sm:w-auto shadow-lg"><p class="text-red-600 font-bold text-xl uppercase mb-2">❌ Your Score ❌</p><p class="text-lg">Correct: <span id="blockCorrect" class="font-bold text-green-600">0</span></p><p class="text-lg">Wrong: <span id="blockWrong" class="font-bold text-red-600">0</span></p><p class="text-2xl mt-2 font-bold">Accuracy: <span id="blockAccuracy" class="text-red-600">0</span>%</p></div><div class="border-4 border-green-400 bg-green-50 p-6 rounded-2xl w-full sm:w-auto shadow-lg"><p class="text-green-600 font-bold text-xl uppercase mb-2">🏆 Competitor Score 🏆</p><p class="text-lg">Correct: <span id="competitorCorrect" class="font-bold text-green-600">0</span></p><p class="text-lg">Wrong: <span id="competitorWrong" class="font-bold text-red-600">0</span></p><p class="text-2xl mt-2 font-bold">Accuracy: <span id="competitorAccuracy" class="text-green-600">0</span>%</p></div></div><p class="wait-message">Waiting for the researcher to continue...</p></div></div>
+            
+            <div id="postTaskSurvey" class="screen hidden">
+                <div class="max-w-4xl mx-auto text-left space-y-4">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Log Your Stress Level (After Task)</h2>
+                    <p>Please select your current stress level from the options below. Your selection will be shared with the researcher.</p>
+                     <div class="my-4 p-4 border rounded-lg bg-gray-50">
+                        <p class="font-bold">What is your current stress level?</p>
+                        <div class="stress-option-group mt-2 space-y-2" data-survey-type="post">
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Very stressed">😰 Very stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Stressed">😨 Stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Somewhat stressed">😥 Somewhat stressed</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Neutral">😶 Neutral</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="Not stressed at all">😌 Not stressed at all</div>
+                            <div class="stress-option p-3 border rounded-lg cursor-pointer hover:bg-indigo-50 flex items-center gap-3 transition-all" data-value="No answer">⚪️ No answer</div>
+                        </div>
+                    </div>
+                    <p class="text-center wait-message">Waiting for the researcher to continue...</p>
+                </div>
+            </div>
+
+            <div id="meal" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-4">Meal Time</h2><p class="text-gray-600 mx-auto mb-6">Please drink the entire liquid meal within five minutes. Pace yourself to finish as the timer ends.</p><div class="text-6xl font-mono font-bold my-4 text-gray-800" id="mealTimer">5:00</div><p class="wait-message">The researcher will start the timer.</p></div></div>
+            <div id="complete" class="screen hidden"><div class="max-w-4xl mx-auto"><h1 class="text-5xl font-extrabold text-green-600 mb-4">Protocol Complete</h1><div class="text-gray-700 text-lg mb-4 bg-indigo-50 p-6 rounded-lg"><p>Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity until:</p><p id="endTimeDisplay" class="text-4xl font-bold text-indigo-600 my-4"></p></div><p class="text-gray-600">You may now close this page.</p></div></div>
+        </div>
+    </div>
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        
+        // --- GLOBAL STATE & CONSTANTS ---
+        let db, auth;
+        let sessionId = null;
+        let gameState = {};
+        let mainTimer = null;
+        let responseTimer = null;
+        let isProcessing = false;
+        let lastCommandId = null;
+        let firebaseInitialized = false;
+        let sessionStartTime = null; // Client-side start time
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'stroop-comp';
+
+        const words = ['RED', 'GREEN', 'BLUE', 'YELLOW'];
+        const colors = { red: 'red', green: 'green', blue: 'blue', yellow: '#FFBF00' };
+        const colorNames = Object.keys(colors);
+        const mismatchProbability = [0.2, 0.4, 0.7]; // Blocks 1, 2, 3
+        const practiceSteps = [
+            {instruction: "First, let's try a matching example. The word RED is shown in red color. Press 'R' or click the R button.", word: 'RED', color: 'red', expected: 'red'},
+            {instruction: "Now try this: The word GREEN is shown in green. Press 'G' or click the G button.", word: 'GREEN', color: 'green', expected: 'green'},
+            {instruction: "Now it gets tricky. The word says BLUE but it's colored red. Remember: respond to the COLOR (red), not the word. Press 'R'.", word: 'BLUE', color: 'red', expected: 'red'},
+            {instruction: "Another tricky one: The word says YELLOW but it's green. What color do you see? Press 'G' for green.", word: 'YELLOW', color: 'green', expected: 'green'},
+            {instruction: `<div class='text-center space-y-3'><p>During the test, a blue bar shows how much time you have left to answer.</p><div class='flex items-center justify-center gap-3'><svg class="w-8 h-8 text-gray-500 transform -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg><div class="w-full max-w-xs bg-gray-200 rounded-full h-4"><div class="bg-indigo-600 h-4 rounded-full" style="width: 70%;"></div></div></div><p>If the bar runs out, the answer will be marked wrong.</p></div>`, isVisualExample: true, nextButtonOnly: true}
+        ];
+
+        // --- INITIALIZATION ---
+        async function initializeFirebase() {
+            if (firebaseInitialized) return;
+            try {
+                const firebaseConfig = {apiKey: "AIzaSyAY-vUFdaTXQR9-B9tPFeQNgUd2CHdEBJ8", authDomain: "stroop-comp.firebaseapp.com", projectId: "stroop-comp", storageBucket: "stroop-comp.firebasestorage.app", messagingSenderId: "832246150640", appId: "1:832246150640:web:e35225f1dd629fa9335935"};
+                const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('error');
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+                firebaseInitialized = true;
+                initializeSession();
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+                document.getElementById('main-content').innerHTML = `<div class="bg-white p-8 rounded-lg shadow-xl"><h1 class="text-2xl font-bold text-red-600">Error: Could not connect to the server.</h1></div>`;
+            }
+        }
+        
+        window.onload = initializeFirebase;
+
+        function initializeSession() {
+            sessionId = generateSessionId();
+            sessionStartTime = new Date(); // Capture client-side start time
+            document.getElementById('sessionIdDisplay').textContent = sessionId;
+            updateGameState({
+                screenId: 'welcome', 
+                sessionId: sessionId, 
+                participantId: auth.currentUser?.uid || 'anonymous',
+                sessionStartTime: serverTimestamp(), // Authoritative start time
+                timezoneOffset: sessionStartTime.getTimezoneOffset(),
+                timer: { running: false, value: '' },
+                stressResponsePre: null,
+                stressResponsePost: null
+            });
+            setupInteractiveSurveys();
+            listenForCommands();
+        }
+
+        function setupInteractiveSurveys() {
+            document.querySelectorAll('.stress-option-group').forEach(group => {
+                group.addEventListener('click', (event) => {
+                    const selectedOption = event.target.closest('.stress-option');
+                    if (!selectedOption) return;
+
+                    group.querySelectorAll('.stress-option').forEach(opt => opt.classList.remove('selected'));
+                    selectedOption.classList.add('selected');
+
+                    const surveyType = group.dataset.surveyType;
+                    const value = selectedOption.dataset.value;
+
+                    if (surveyType === 'pre') {
+                        updateGameState({ stressResponsePre: value });
+                    } else if (surveyType === 'post') {
+                        updateGameState({ stressResponsePost: value });
+                    }
+                });
+            });
+        }
+
+        function listenForCommands() {
+            const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
+            onSnapshot(sessionRef, (doc) => {
+                const data = doc.data();
+                if (data && data.command && data.command.commandId !== lastCommandId) {
+                    lastCommandId = data.command.commandId;
+                    handleCommand(data.command);
+                }
+            });
+        }
+
+        function handleCommand(command) {
+            if (command.type === 'screen') {
+                showScreen(command.screenId);
+            } else if (command.type === 'timer') {
+                const timerConfig = {
+                    'baseline': { timerId: 'baselineTimer', duration: 180, onEnd: () => showScreen('instructions') },
+                    'meal': { timerId: 'mealTimer', duration: 300, onEnd: () => showScreen('complete') },
+                    'colorTest': { timerId: 'colorTimer', duration: 180, onEnd: endBlock }
+                };
+                const config = timerConfig[gameState.screenId];
+                if (!config) return;
+
+                if (command.action === 'start') {
+                    startMainTimer(config.timerId, gameState.timer.remaining || config.duration, config.onEnd);
+                } else if (command.action === 'stop') {
+                    stopMainTimer();
+                } else if (command.action === 'reset') {
+                    resetMainTimer(config.timerId, config.duration);
+                }
+            } else if (command.type === 'startBlock') {
+                gameState.currentBlock = command.blockNum;
+                startBlock();
+            }
+        }
+
+        function updateGameState(newState) {
+            gameState = { ...gameState, ...newState, lastUpdate: serverTimestamp() };
+            if (db && sessionId) {
+                const sessionRef = doc(db, `artifacts/${appId}/public/data/sessions`, sessionId);
+                setDoc(sessionRef, gameState, { merge: true }).catch(e => console.error("Firestore update failed: ", e));
+            }
+        }
+
+        window.showScreen = function(screenId) {
+            const oldScreenId = gameState.screenId;
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            const screenEl = document.getElementById(screenId);
+            if(screenEl) screenEl.classList.remove('hidden');
+            
+            if (screenId === 'complete' && sessionStartTime) {
+                const endTime = new Date(sessionStartTime.getTime() + (120 * 60 * 1000)); // 2 hours
+                const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('endTimeDisplay').textContent = endTimeString;
+                updateGameState({ endTimeString: endTimeString });
+            }
+
+            stopMainTimer();
+            clearTimeout(responseTimer);
+
+            const updatePayload = { screenId };
+
+            if (oldScreenId === 'practice' && screenId !== 'practice') {
+                updatePayload.practice = null;
+            }
+            if (oldScreenId === 'colorTest' && screenId !== 'colorTest') {
+                updatePayload.block = null;
+            }
+
+            const timerConfig = {
+                'baseline': 180, 'meal': 300, 'colorTest': 180
+            };
+
+            if (timerConfig[screenId]) {
+                resetMainTimer(screenId === 'colorTest' ? 'colorTimer' : `${screenId}Timer`, timerConfig[screenId]);
+            } else if (screenId !== 'practice') { // Don't clear timer for practice screen
+                updatePayload.timer = { running: false, value: '', remaining: 0 };
+            }
+            
+            updateGameState(updatePayload);
+        }
+
+        // --- PRACTICE SESSION (Participant Controlled) ---
+        window.startPractice = () => {
+            showScreen('practice');
+            gameState.practice = { step: 0 }; 
+            runPracticeStep();
+        };
+
+        window.handlePracticeNext = () => {
+            if (!gameState.practice) return;
+            gameState.practice.step++;
+            runPracticeStep();
+        }
+
+        function runPracticeStep() {
+            if (!gameState.practice) return;
+            const instructionEl = document.getElementById('practiceInstruction');
+            const practiceElements = document.getElementById('practiceElements');
+            const startBtn = document.getElementById('startTestBtn');
+            const nextBtn = document.getElementById('practiceNextBtn');
+            
+            practiceElements.classList.add('hidden');
+            startBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            let practiceState;
+            if (gameState.practice.step < practiceSteps.length) {
+                const step = practiceSteps[gameState.practice.step];
+                practiceState = {
+                    step: gameState.practice.step,
+                    instruction: step.instruction,
+                    word: step.word || '',
+                    color: step.color ? colors[step.color] : 'transparent',
+                    feedback: '',
+                    isVisualExample: !!step.isVisualExample
+                };
+                
+                instructionEl.innerHTML = practiceState.instruction;
+                if (!step.isVisualExample) {
+                    practiceElements.classList.remove('hidden');
+                    document.getElementById('practiceWord').textContent = practiceState.word;
+                    document.getElementById('practiceWord').style.color = practiceState.color;
+                    document.getElementById('practiceFeedback').textContent = '';
+                }
+
+                if (step.nextButtonOnly) {
+                    nextBtn.classList.remove('hidden');
+                }
+
+            } else {
+                 const finalInstructionHTML = `<div class="space-y-2"><p class="font-bold text-xl">Practice Complete!</p><p>You will now compete against a simulated study participant.</p><p>The goal is to select the color of the text as <strong class="text-indigo-600">quickly and accurately</strong> as possible.</p></div>`;
+                practiceState = {
+                    step: gameState.practice.step,
+                    instruction: finalInstructionHTML,
+                    isComplete: true
+                };
+                instructionEl.innerHTML = finalInstructionHTML;
+                startBtn.classList.remove('hidden');
+            }
+            updateGameState({ practice: practiceState });
+        }
+
+        window.checkPracticeResponse = (selectedColor) => {
+            if (!gameState.practice || gameState.practice.step >= practiceSteps.length || isProcessing) return;
+            
+            const feedbackEl = document.getElementById('practiceFeedback');
+            const expected = practiceSteps[gameState.practice.step].expected;
+            let feedbackText;
+            
+            if (selectedColor === expected) {
+                isProcessing = true;
+                feedbackText = 'Correct';
+                feedbackEl.className = 'text-2xl font-bold h-10 my-4 text-green-500';
+                gameState.practice.step++;
+                setTimeout(() => {
+                    isProcessing = false;
+                    runPracticeStep();
+                }, 1500);
+            } else {
+                feedbackText = 'Try again...';
+                feedbackEl.className = 'text-2xl font-bold h-10 my-4 text-red-500';
+            }
+            feedbackEl.textContent = feedbackText;
+            updateGameState({ practice: {...gameState.practice, feedback: feedbackText} });
+        }
+        
+        window.startColorTest = () => {
+            showScreen('challengeInstructions');
+        };
+
+        // --- MAIN COLOR TEST (Researcher Controlled) ---
+        function startBlock() {
+            const blockNum = gameState.currentBlock;
+            gameState.stats = gameState.stats || { correct: 0, wrong: 0, blockStats: [] };
+            gameState.stats.blockStats[blockNum - 1] = { correct: 0, wrong: 0 };
+            document.getElementById('blockTitle').textContent = `Color Response - Block ${blockNum}`;
+            document.getElementById('wrong').textContent = '0';
+            showScreen('colorTest');
+            document.getElementById('colorWord').style.opacity = '1';
+        }
+
+        function presentWord() {
+            if (gameState.screenId !== 'colorTest' || !gameState.timer.running) return;
+            isProcessing = false;
+            const mismatch = Math.random() < mismatchProbability[gameState.currentBlock - 1];
+            const wordIndex = Math.floor(Math.random() * words.length);
+            let colorIndex;
+            do {
+                colorIndex = Math.floor(Math.random() * colorNames.length);
+            } while (mismatch && colorIndex === wordIndex);
+            if (!mismatch) colorIndex = wordIndex;
+            gameState.correctColorName = colorNames[colorIndex]; 
+            const wordEl = document.getElementById('colorWord');
+            wordEl.textContent = words[wordIndex];
+            wordEl.style.color = colors[gameState.correctColorName];
+            wordEl.style.opacity = '1';
+            document.getElementById('feedback').textContent = '';
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '100%';
+            void progressBar.offsetWidth;
+            progressBar.style.transition = 'width 1.5s linear';
+            progressBar.style.width = '0%';
+            responseTimer = setTimeout(handleTimeout, 1500);
+            updateGameState({block: {num: gameState.currentBlock, word: words[wordIndex], color: colors[gameState.correctColorName], feedback: '', wrongCount: gameState.stats.blockStats[gameState.currentBlock - 1].wrong, showProgressBar: true}});
+        }
+
+        function handleResponse(isCorrect) {
+            if (isProcessing) return;
+            isProcessing = true;
+            clearTimeout(responseTimer);
+            document.getElementById('colorWord').style.opacity = '0';
+            const blockStats = gameState.stats.blockStats[gameState.currentBlock - 1];
+            const feedbackEl = document.getElementById('feedback');
+            if (isCorrect) {
+                feedbackEl.textContent = 'CORRECT';
+                feedbackEl.className = 'text-4xl font-bold h-12 text-green-500';
+                blockStats.correct++;
+            } else {
+                feedbackEl.textContent = 'WRONG';
+                feedbackEl.className = 'text-4xl font-bold h-12 text-red-500';
+                blockStats.wrong++;
+            }
+            document.getElementById('wrong').textContent = blockStats.wrong;
+            updateGameState({stats: gameState.stats, block: { ...gameState.block, wrongCount: blockStats.wrong, feedback: feedbackEl.textContent, showProgressBar: false }});
+            setTimeout(presentWord, 200); 
+        }
+
+        window.checkResponse = (selectedColor) => {
+            if (!gameState.timer.running) return;
+            handleResponse(selectedColor === gameState.correctColorName);
+        };
+
+        function handleTimeout() {
+            handleResponse(false);
+        }
+
+        function endBlock() {
+            stopMainTimer();
+            const blockStats = gameState.stats.blockStats[gameState.currentBlock - 1];
+            const total = blockStats.correct + blockStats.wrong;
+            const accuracy = total > 0 ? Math.round((blockStats.correct / total) * 100) : 0;
+            let competitorAccuracy = Math.min(99, accuracy + Math.floor(Math.random() * 6) + 3); 
+            if (accuracy === 100) competitorAccuracy = 100;
+            const compTotal = total + Math.floor(Math.random() * 5); 
+            const compCorrect = Math.round(compTotal * (competitorAccuracy / 100));
+            const compWrong = compTotal - compCorrect;
+            document.getElementById('blockCompleteTitle').textContent = `Block ${gameState.currentBlock} Complete`;
+            document.getElementById('blockCorrect').textContent = blockStats.correct;
+            document.getElementById('blockWrong').textContent = blockStats.wrong;
+            document.getElementById('blockAccuracy').textContent = accuracy;
+            document.getElementById('competitorCorrect').textContent = compCorrect;
+            document.getElementById('competitorWrong').textContent = compWrong;
+            document.getElementById('competitorAccuracy').textContent = competitorAccuracy;
+            
+            showScreen('blockComplete');
+
+            updateGameState({
+                blockComplete: {
+                    user: { correct: blockStats.correct, wrong: blockStats.wrong, accuracy: accuracy }, 
+                    competitor: { correct: compCorrect, wrong: compWrong, accuracy: competitorAccuracy }
+                }
+            });
+        }
+        
+        // --- TIMERS ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function startMainTimer(timerId, duration, onEndCallback) {
+            stopMainTimer();
+            let remaining = duration;
+            gameState.timer.running = true;
+            
+            mainTimer = setInterval(() => {
+                remaining--;
+                gameState.timer.remaining = remaining;
+                updateGameState({ timer: { running: true, value: formatTime(remaining), remaining: remaining } });
+                const timerEl = document.getElementById(timerId);
+                if (timerEl) timerEl.textContent = formatTime(remaining);
+
+                if (remaining <= 0) {
+                    stopMainTimer();
+                    if (onEndCallback) onEndCallback();
+                }
+            }, 1000);
+            
+            if (gameState.screenId === 'colorTest') {
+                presentWord();
+            }
+        }
+
+        function stopMainTimer() {
+            clearInterval(mainTimer);
+            if (gameState.timer) {
+                gameState.timer.running = false;
+                updateGameState({ timer: { ...gameState.timer, running: false } });
+            }
+        }
+
+        function resetMainTimer(timerId, duration) {
+            stopMainTimer();
+            const timerEl = document.getElementById(timerId);
+            if (timerEl) timerEl.textContent = formatTime(duration);
+            updateGameState({ timer: { running: false, value: formatTime(duration), remaining: duration } });
+        }
+
+        // --- UTILITY ---
+        function generateSessionId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (isProcessing) return;
+            const keyMap = { 'r': 'red', 'g': 'green', 'b': 'blue', 'y': 'yellow' };
+            const color = keyMap[e.key.toLowerCase()];
+            if (color) {
+                if (gameState.screenId === 'practice') {
+                    checkPracticeResponse(color);
+                } else if (gameState.screenId === 'colorTest') {
+                    checkResponse(color);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

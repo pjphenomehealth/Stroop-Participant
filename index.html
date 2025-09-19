@@ -64,10 +64,17 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div id="main-content" class="w-full">
-        <div id="app-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto pb-20">
-            <div id="sessionIdContainer" class="absolute bottom-4 left-4 bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md z-10">
-                Session ID: <span id="sessionIdDisplay" class="font-bold"></span>
-            </div>
+       
+    <div id="app-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto">
+    <!-- All screens here -->
+    </div>
+
+    <!-- Session ID bubble wrapper -->
+    <div id="sessionIdWrapper">
+        <div id="sessionIdContainer" class="bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md">
+            Session ID: <span id="sessionIdDisplay" class="font-bold"></span>
+        </div>
+    </div>
             <!-- All Screens -->
             <div id="welcome" class="screen"><div class="max-w-4xl mx-auto"><h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">Color Response Test</h1><p class="text-gray-600 mb-8 text-lg">This test will take approximately 22 minutes.</p><p class="wait-message">Please wait for the researcher to begin.</p></div></div>
             

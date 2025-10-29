@@ -64,7 +64,7 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div id="main-content" class="w-full">
-       <div id="app-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto pb-24 min-h-[70vh]">
+       <div id="app-container" class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl max-w-5xl w-full text-center relative transition-all duration-500 mx-auto pb-24 min-h-[50vh]">
             <div id="sessionIdContainer" class="absolute bottom-4 left-4 bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-lg shadow-md">
                 Session ID: <span id="sessionIdDisplay" class="font-bold"></span>
             </div>
@@ -92,7 +92,18 @@
                 </div>
             </div>
 
-            <div id="baseline" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-4">Resting Baseline</h2><p class="text-gray-600 mb-6">Please relax, clear your mind, and remain still and quiet for three minutes.</p><div class="text-6xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00</div><p class="wait-message">The researcher will start the timer.</p></div></div>
+            <div id="baseline" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Resting Baseline
+                    </h2>
+                    <p class="text-gray-600 mb-6">Please relax, clear your mind, and remain still and quiet for three minutes.
+                    </p>
+                    <div class="text-6xl font-mono font-bold my-4 text-gray-800" id="baselineTimer">3:00
+                    </div>
+                    <p class="wait-message">The researcher will start the timer.
+                    </p>
+                </div>
+            </div>
             <div id="instructions" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-6">Color Response Instructions</h2><div class="text-left mx-auto text-gray-700 space-y-4"><p class="font-bold">Important: Respond to the <em>color</em> of the text, not the actual word.</p><p>You have two ways to respond:</p><ul class="list-disc list-inside ml-4 space-y-2"><li><strong>Use your keyboard:</strong><ul class="list-none list-inside ml-6 font-semibold"><li>Press <strong class="text-red-600">R</strong> for Red</li><li>Press <strong class="text-green-600">G</strong> for Green</li><li>Press <strong class="text-blue-600">B</strong> for Blue</li><li>Press <strong class="text-yellow-500">Y</strong> for Yellow</li></ul></li><li><strong>Click the on-screen buttons:</strong> Use your mouse to click the buttons below the word.</li></ul><p><strong>Examples:</strong></p><div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-1"><div>If you see <span style="color:red; font-weight: bold;">GREEN</span> → Press “R” for Red.</div><div>If you see <span style="color:blue; font-weight: bold;">RED</span> → Press “B” for Blue.</div></div><p>Focus on the color of the text, not what the word says.</p></div><div class="text-center mt-8"><button class="button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg text-xl" onclick="startPractice()">Start Practice</button></div></div></div>
             <div id="practice" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-2">Practice Session</h2><div class="instructions text-gray-600 mb-4 mx-auto min-h-[10rem] flex items-center justify-center p-4"><div id="practiceInstruction">Let's practice responding to colors.</div></div><div id="practiceElements" class="hidden"><div class="stroop-word text-6xl my-4" id="practiceWord"></div><div class="flex justify-center space-x-4 my-6" id="practiceButtons"><button class="response-button" onclick="checkPracticeResponse('red')">R</button><button class="response-button" onclick="checkPracticeResponse('green')">G</button><button class="response-button" onclick="checkPracticeResponse('blue')">B</button><button class="response-button" onclick="checkPracticeResponse('yellow')">Y</button></div><div class="text-2xl font-bold h-10 my-4" id="practiceFeedback"></div></div><button id="practiceNextBtn" class="button hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg mt-4" onclick="handlePracticeNext()">Next</button><button class="button hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg" id="startTestBtn" onclick="startColorTest()">Begin Color Response Test</button></div></div>
             <div id="challengeInstructions" class="screen hidden"><div class="max-w-4xl mx-auto"><h2 class="text-3xl font-bold text-gray-800 mb-6">Competition Instructions</h2><div class="text-left mx-auto text-gray-700 space-y-4 bg-indigo-50 p-6 rounded-lg"><p>You'll now compete against a simulated opponent.</p><p>Your goal is to finish each trial as <strong>fast and as accurately as possible</strong>.</p><p>There are three rounds. After each round you'll see a performance summary; review it briefly, then the next round will begin.</p></div><p class="wait-message">Waiting for the researcher to begin Round 1.</p></div></div>
@@ -122,19 +133,26 @@
             </div>
 
             <div id="meal" class="screen hidden">
-                <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-2xl text-center">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Meal Time
-                    </h2>
-                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto" >
-                        Please drink the entire liquid meal within five minutes. Pace yourself to finish as the timer ends.
-                    </p>        
-                    <div class="text-6xl font-mono font-bold my-4 text-gray-800" id="mealTimer">
-                        5:00
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Meal Time</h2>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto" >Please drink the entire liquid meal within five minutes. Pace yourself to finish as the timer ends.</p>        
+                    <div class="text-6xl font-mono font-bold my-4 text-gray-800" id="mealTimer">5:00
                     </div>
                     <p class="wait-message">The researcher will start the timer.</p>
                 </div>
             </div>
-            <div id="complete" class="screen hidden"><div class="max-w-4xl mx-auto"><h1 class="text-5xl font-extrabold text-green-600 mb-4">Protocol Complete</h1><div class="text-gray-700 text-lg mb-4 bg-indigo-50 p-6 rounded-lg"><p>Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity until:</p><p id="endTimeDisplay" class="text-4xl font-bold text-indigo-600 my-4"></p></div><p class="text-gray-600">You may now close this page.</p></div></div>
+            <div id="complete" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-5xl font-extrabold text-green-600 mb-4">Protocol Complete
+                    </h1>
+                    <div class="text-gray-700 text-lg mb-4 bg-indigo-50 p-6 rounded-lg">
+                        <p>Thank you for your participation. Please remember to avoid food, beverages (other than water), and strenuous or stressful activity until:</p>
+                        <p id="endTimeDisplay" class="text-4xl font-bold text-indigo-600 my-4"></p>
+                    </div>
+                    <p class="text-gray-600">You may now close this page.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Firebase -->

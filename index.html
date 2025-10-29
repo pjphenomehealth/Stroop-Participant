@@ -141,6 +141,7 @@
         let lastCommandId = null;
         let firebaseInitialized = false;
         let sessionStartTime = null; // Client-side start time
+        let mealStartTime = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'stroop-comp';
 
         const words = ['RED', 'GREEN', 'BLUE', 'YELLOW'];
@@ -241,6 +242,12 @@
 
                 if (command.action === 'start') {
                     startMainTimer(config.timerId, gameState.timer.remaining || config.duration, config.onEnd);
+
+                    // Record meal start time when meal timer begins
+                    if (gameState.screenId === 'meal') {
+                    mealStartTime = new Date();
+                    }
+                    
                 } else if (command.action === 'stop') {
                     stopMainTimer();
                 } else if (command.action === 'reset') {
@@ -266,8 +273,8 @@
             const screenEl = document.getElementById(screenId);
             if(screenEl) screenEl.classList.remove('hidden');
             
-            if (screenId === 'complete' && sessionStartTime) {
-                const endTime = new Date(sessionStartTime.getTime() + (120 * 60 * 1000)); // 2 hours
+            if (screenId === 'complete' && mealStartTime) {
+                const endTime = new Date(mealStartTime.getTime() + (120 * 60 * 1000)); // 2 hours
                 const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('endTimeDisplay').textContent = endTimeString;
                 updateGameState({ endTimeString: endTimeString });
